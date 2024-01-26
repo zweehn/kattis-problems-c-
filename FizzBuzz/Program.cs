@@ -4,109 +4,60 @@ using System.Linq;
 
 
 string line;
-int counter = 0;
-int n;
-int k;
-
-const int LEFT = 1;
-const int RIGHT = 2;
+long c;
+long d;
 
 line = Console.ReadLine();
 
+var split1 = line.Split(" ");
+c = Int64.Parse(split1[0]);
+d = Int64.Parse(split1[1]);
+
+
+var a = 1000000L;
+var b = 1000000L;
+bool afinal = false;
+bool bfinal = false;
+
+line = Console.ReadLine();
+var split2 = line.Split(" ");
+for (long i = c; i <= d; i++)
 {
-    var split = line.Split(" ");
-    n = Int32.Parse(split[0]);
-    k = Int32.Parse(split[1]);
+    if (isFizz(split2[i - c]))
+    {
+        if (i < a)
+        {
+            a = i;
+        }
+        else if (afinal == false)
+        {
+            a = i - a;
+            afinal = true;
+        }
+    }
+
+    if (isBuzz(split2[i - c]))
+    {
+        if (i < b)
+        {
+            b = i;
+        }
+        else if (bfinal == false)
+        {
+            b = i - b;
+            bfinal = true;
+        }
+    }
 }
 
-int[,] rooms = new int[n, 3];
-int[] closed = new int[n];
 
-while ((line = Console.ReadLine()) != null && counter < n)
+bool isFizz(string s)
 {
-    var split = line.Split(" ");
-    rooms[counter, LEFT] = Int32.Parse(split[0]);
-    rooms[counter, RIGHT] = Int32.Parse(split[1]);
-    counter++;
+    return s.Contains("Fizz");
+}
+bool isBuzz(string s)
+{
+    return s.Contains("Buzz");
 }
 
-Dictionary<(int, int, int), int> memory = new Dictionary<(int, int, int), int>();
-
-int maxValue(int from, int prevclose, int remk)
-{
-    if (memory.ContainsKey((from, prevclose, remk)))
-    {
-        return memory[(from, prevclose, remk)];
-    }
-    else
-    {
-        int value = maxValueInner(from, prevclose, remk);
-        memory[(from, prevclose, remk)] = value;
-        return value;
-    }
-}
-
-int maxValueInner(int from, int prevclose, int remk)
-{
-    if (from == n - 1)
-    {
-        if (remk > 1) return int.MinValue;
-        if (remk == 1)
-        {
-            if (prevclose == 0) return Math.Max(rooms[from, LEFT], rooms[from, RIGHT]);
-            else if (prevclose == LEFT) return rooms[from, RIGHT];
-            else if (prevclose == RIGHT) return rooms[from, LEFT];
-            else return 0;
-        }
-        else
-        {
-            return rooms[from, LEFT] + rooms[from, RIGHT];
-        }
-    }
-    else if (from >= n)
-    {
-        return 0;
-    }
-
-    int max = Int32.MinValue;
-    if (prevclose == 0)
-    {
-        if (remk == 0)
-        {
-            max = Math.Max(max, rooms[from, LEFT] + rooms[from, RIGHT] + maxValue(from + 1, 0, remk));
-        }
-        else
-        {
-            max = Math.Max(max, rooms[from, LEFT] + maxValue(from + 1, RIGHT, remk - 1)); // Close room 1
-            max = Math.Max(max, rooms[from, RIGHT] + maxValue(from + 1, LEFT, remk - 1)); // Close room 2
-            max = Math.Max(max, rooms[from, LEFT] + rooms[from, RIGHT] + maxValue(from + 1, 0, remk)); // Close no room
-        }
-    }
-    else if (prevclose == LEFT)
-    {
-        if (remk == 0)
-        {
-            max = Math.Max(max, rooms[from, RIGHT] + maxValue(from + 1, 0, remk));
-        }
-        else
-        {
-            max = Math.Max(max, rooms[from, RIGHT] + maxValue(from + 1, LEFT, remk - 1)); // Close room LEFT
-            max = Math.Max(max, rooms[from, LEFT] + rooms[from, RIGHT] + maxValue(from + 1, 0, remk)); // Close no room
-        }
-    }
-    else if (prevclose == RIGHT)
-    {
-        if (remk == 0)
-        {
-            max = Math.Max(max, rooms[from, LEFT] + maxValue(from + 1, 0, remk));
-        }
-        else
-        {
-            max = Math.Max(max, rooms[from, LEFT] + maxValue(from + 1, RIGHT, remk - 1)); // Close room RIGHT
-            max = Math.Max(max, rooms[from, LEFT] + rooms[from, RIGHT] + maxValue(from + 1, 0, remk)); // Close no room
-        }
-    }
-    return max;
-}
-
-Console.WriteLine(maxValue(0, 0, k));
+Console.WriteLine(a + " " + b);
